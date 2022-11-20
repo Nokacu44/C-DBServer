@@ -1,0 +1,1 @@
+gcc test.c ./lib/server.c ./lib/externals/cJSON.c -lneo4j-client -lssl -lcrypto -o test

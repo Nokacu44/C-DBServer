@@ -1,7 +1,10 @@
 {
   "files.associations": {
     "stdlib.h": "c",
-    "server.h": "c"
+    "server.h": "c",
+    "neo4j-client.h": "c",
+    "stdio.h": "c",
+    "cjson.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }
