@@ -2,6 +2,7 @@
 #include <neo4j-client.h>
 #include <errno.h>
 #include "lib/externals/cJSON.h"
+#include <mysql.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +26,7 @@ char* jsonTest()
 
 void neo4jTest()
 {
+    mysql_init(NULL);
    neo4j_client_init();
 
     /* use NEO4J_INSECURE when connecting to disable TLS */

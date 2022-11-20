@@ -1,1 +1,1 @@
-gcc test.c ./lib/server.c ./lib/externals/cJSON.c -lneo4j-client -lssl -lcrypto -o test
+gcc $(mysql_config --cflags) test.c ./lib/server.c ./lib/externals/cJSON.c  $(mysql_config --libs) -lneo4j-client -lssl -lcrypto -o test
