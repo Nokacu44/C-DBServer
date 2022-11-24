@@ -26,12 +26,11 @@ char* jsonTest()
 
 void neo4jTest()
 {
-    mysql_init(NULL);
-   neo4j_client_init();
+    neo4j_client_init();
 
     /* use NEO4J_INSECURE when connecting to disable TLS */
     neo4j_connection_t *connection =
-            neo4j_connect("neo4j://user:pass@localhost:7687", NULL, NEO4J_INSECURE);
+            neo4j_connect("bolt://neo4j:123@localhost:7687", NULL, NEO4J_INSECURE);
     if (connection == NULL)
     {
         neo4j_perror(stderr, errno, "Connection failed");
@@ -65,33 +64,41 @@ void neo4jTest()
 
 void launch(struct Server* server)
 {
-  neo4jTest();
+  //neo4jTest();
 
-  char buffer[1204];
   printf("===== WAIT FOR CONNECTION =====\n");
   int address_length = sizeof(server->address);
   while (1)
   {
+    char buffer[1204];
+
     int new_socket = accept(
         server->socket, 
         (struct sockaddr*)&server->address, 
         (socklen_t*)&address_length
     );
 
-    // invia messaggio etc
-    read(new_socket, buffer, 1024);
-    //struct HTTPRequest request = HTTPRequest_constructor(buffer);
-    printf("%s", buffer);
-    printf("%s", buffer);
-    if (strncmp(buffer,"get-all-drinks", strlen("get-all-drinks")) == 0)
-    {
-      printf("PRENDO TUTTI I DRINKS\n");
+    while(1) {
+      // Leggi messaggio
+      read(new_socket, buffer, 1024);
+
+      // Computa
+      printf("%s", buffer);
+      
+      if (strncmp(buffer,"get-all-drinks", strlen("get-all-drinks")) == 0)
+      {
+        printf("PRENDO TUTTI I DRINKS\n");
+      }
+      char* jsonString = jsonTest();
+      printf("%s\n",jsonString);
+      write(new_socket, jsonString, strlen(jsonString));
+      
+      // pulisci buffer
+      memset(buffer, 0, sizeof(buffer));
     }
+
     // TODO: usare json
     //char* hello = "Messaggio ricevuto dal server Unix";
-    char* jsonString = jsonTest();
-    printf("%s\n",jsonString);
-    write(new_socket, jsonString, strlen(jsonString));
     close(new_socket);
   }
 
