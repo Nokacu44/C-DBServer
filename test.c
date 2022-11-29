@@ -10,6 +10,8 @@
 #include <unistd.h> // for close()
 #include <arpa/inet.h>
 
+
+// Struct describing a Client
 typedef struct {
   struct sockaddr_in address;
   int sockfd;
@@ -43,7 +45,7 @@ void *handle_client(void *cli) {
     if (receive > 0) {
       if (strlen(buff) > 0) {
         // send message
-        sprintf(buff_out, "Messaggio da server linux.");
+        sprintf(buff, "Messaggio da server linux.");
         send(client->sockfd, buff, strlen(buff), 0);
         printf("%s\n", buff);
       }
