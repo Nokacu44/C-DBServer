@@ -1,14 +1,19 @@
 #include "lib/server.h"
-#include <neo4j-client.h>
 #include <errno.h>
 #include "lib/externals/cJSON.h"
 #include <mysql.h>
-
+#include <pthread.h>
+#include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h> // for open()
 #include <unistd.h> // for close()
+#include <arpa/inet.h>
 
+typedef struct {
+  struct sockaddr_in address;
+  int sockfd;
+} client_t;
 
 char* jsonTest()
 {
@@ -24,84 +29,67 @@ char* jsonTest()
     return string;
 }
 
-void neo4jTest()
-{
-    neo4j_client_init();
+void *handle_client(void *cli) {
+  printf("Entered handle");
+  char buff[2048];
+  int leave_flag = 0;
 
-    /* use NEO4J_INSECURE when connecting to disable TLS */
-    neo4j_connection_t *connection =
-            neo4j_connect("bolt://neo4j:123@localhost:7687", NULL, NEO4J_INSECURE);
-    if (connection == NULL)
-    {
-        neo4j_perror(stderr, errno, "Connection failed");
-        exit(1);
+  client_t *client = (client_t *)cli;
+
+  while(1) {
+    if (leave_flag) break;
+
+    int receive = recv(client->sockfd, buff, 2048, 0);
+    if (receive > 0) {
+      if (strlen(buff) > 0) {
+        // send message
+        sprintf(buff_out, "Messaggio da server linux.");
+        send(client->sockfd, buff, strlen(buff), 0);
+        printf("%s\n", buff);
+      }
+    } else if (receive == 0 || strncmp(buff, "exit", strlen("exit")) == 0) {
+      printf("Client uscito.");
+      leave_flag = 1;
+    } else {
+      printf("ERROR: -1\n");
+      leave_flag = 1;
     }
 
-    neo4j_result_stream_t *results =
-            neo4j_run(connection, "RETURN 'hello world'", neo4j_null);
-    if (results == NULL)
-    {
-        neo4j_perror(stderr, errno, "Failed to run statement");
-        exit(1);
-    }
+    bzero(buff, 2048);
+  }
 
-    neo4j_result_t *result = neo4j_fetch_next(results);
-    if (result == NULL)
-    {
-        neo4j_perror(stderr, errno, "Failed to fetch result");
-        exit(1);
-
-    }
-
-    neo4j_value_t value = neo4j_result_field(result, 0);
-    char buf[128];
-    printf("%s\n", neo4j_tostring(value, buf, sizeof(buf)));
-
-    neo4j_close_results(results);
-    neo4j_close(connection);
-    neo4j_client_cleanup();
+  printf("Uscito");
+  close(client->sockfd);
+  free(client);
+  pthread_detach(pthread_self());
+  return NULL;
 }
 
+
+pthread_t tid;
 void launch(struct Server* server)
 {
-  //neo4jTest();
-
+  char buffer[1204];
   printf("===== WAIT FOR CONNECTION =====\n");
-  int address_length = sizeof(server->address);
+  struct sockaddr_in cli_addr;
   while (1)
   {
-    char buffer[1204];
-
+    int address_length = sizeof(cli_addr);
     int new_socket = accept(
         server->socket, 
-        (struct sockaddr*)&server->address, 
+        (struct sockaddr*)&cli_addr, 
         (socklen_t*)&address_length
     );
 
-    while(1) {
-      // Leggi messaggio
-      read(new_socket, buffer, 1024);
+    // Create client
+    client_t* cli = (client_t*)malloc(sizeof(client_t));
+    cli->address = cli_addr;
+    cli->sockfd = new_socket;
 
-      // Computa
-      printf("%s", buffer);
-      
-      if (strncmp(buffer,"get-all-drinks", strlen("get-all-drinks")) == 0)
-      {
-        printf("PRENDO TUTTI I DRINKS\n");
-      }
-      char* jsonString = jsonTest();
-      printf("%s\n",jsonString);
-      write(new_socket, jsonString, strlen(jsonString));
-      
-      // pulisci buffer
-      memset(buffer, 0, sizeof(buffer));
-    }
+    pthread_create(&tid, NULL, &handle_client, (void*)cli);
 
-    // TODO: usare json
-    //char* hello = "Messaggio ricevuto dal server Unix";
-    close(new_socket);
+    sleep(1);
   }
-
 }
 
 int main() 
