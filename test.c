@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include "lib/server.h"
 #include <errno.h>
 #include "lib/externals/cJSON.h"
@@ -213,5 +212,5 @@ int main()
   struct Server server = server_constructor(AF_INET, SOCK_STREAM, 0, INADDR_ANY, 80, 10, launch);
   server.launch(&server);
   close(server.socket);
->>>>>>> 3ccc1c85a67cf4d54ea1d81da5ef1e348bc33fe9
+
 }
