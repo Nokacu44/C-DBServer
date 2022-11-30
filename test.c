@@ -43,9 +43,22 @@ void *handle_client(void *cli) {
     if (receive > 0) {
       if (strlen(buff) > 0) {
         // send message
-        sprintf(buff_out, "Messaggio da server linux.");
-        send(client->sockfd, buff, strlen(buff), 0);
-        printf("%s\n", buff);
+        sprintf(buff, "Messaggio da server linux.");
+        send(client->sockfd, buff, strlen(buff), 0);        
+
+        // Check se è json...
+        // parsing
+        cJSON* query = cJSON_ParseWithLength(buff, strlen(buff));
+        cJSON* command = cJSON_GetObjectItemCaseSensitive(query, "command");
+        cJSON* params = cJSON_GetObjectItemCaseSensitive(query, "params");
+
+        // Printa messaggio da client
+        printf("Query command: %s\n", command->valuestring);
+        /*
+        cJSON_ArrayForEach(query, params) {
+          printf("Query param: %s\n", par)
+        }
+        */
       }
     } else if (receive == 0 || strncmp(buff, "exit", strlen("exit")) == 0) {
       printf("Client uscito.");
@@ -88,7 +101,7 @@ void launch(struct Server* server)
 
     pthread_create(&tid, NULL, &handle_client, (void*)cli);
 
-    sleep(1);
+    sleep(1); // Previene uso eccessivo della ram
   }
 }
 
