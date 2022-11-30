@@ -9,6 +9,8 @@
 #include <fcntl.h> // for open()
 #include <unistd.h> // for close()
 #include <arpa/inet.h>
+#include <stdlib.h>
+#include "lib/queries.h"
 
 typedef struct {
   struct sockaddr_in address;
@@ -53,11 +55,25 @@ void *handle_client(void *cli) {
         // Printa messaggio da client
         printf("Query command: %s\n", command->valuestring);
         
-        /*
-        cJSON_ArrayForEach(query, params) {
-          printf("Query param: %s\n", par)
+
+        const cJSON* parametro = NULL;
+        int length = cJSON_GetArraySize(params);
+        char** array = malloc(length*sizeof(char*));
+
+        int i = 0;
+        cJSON_ArrayForEach(parametro, params) {
+          array[i] = malloc((strlen(parametro->valuestring) + 1) * sizeof(char));
+          strcpy(array[i], (char*)parametro->valuestring);
+          printf("Query param: %s\n", parametro->valuestring);
+          ++i;
         }
-        */
+
+        query_router(command->valuestring, array, length);
+
+        for(int j=0; j<length; j++){
+            free(array[i]);
+        }
+        free(array);
 
         // send message
         sprintf(buff, "Messaggio da server linux.");
