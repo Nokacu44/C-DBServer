@@ -5,7 +5,9 @@
     "neo4j-client.h": "c",
     "stdio.h": "c",
     "cjson.h": "c",
-    "unistd.h": "c"
+    "unistd.h": "c",
+    "inet.h": "c",
+    "string.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

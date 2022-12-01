@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+
 struct Server 
 {
   int domain;

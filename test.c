@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include "lib/queries.h"
 
+
+// Struct del client
 typedef struct {
   struct sockaddr_in address;
   int sockfd;
@@ -68,15 +70,15 @@ void *handle_client(void *cli) {
           ++i;
         }
 
-        query_router(command->valuestring, array, length);
+        unsigned int error = query_router(command->valuestring, array, length);
 
         for(int j=0; j<length; j++){
-            free(array[i]);
+            free(array[j]);
         }
         free(array);
 
         // send message
-        sprintf(buff, "Messaggio da server linux.");
+        sprintf(buff, "Messaggio da server linux -> codice query: %d", error);
         send(client->sockfd, buff, strlen(buff), 0);       
       }
     } else if (receive == 0 || strncmp(buff, "exit", strlen("exit")) == 0) {
@@ -90,7 +92,7 @@ void *handle_client(void *cli) {
     bzero(buff, 2048);
   }
 
-  printf("Uscito");
+  printf("Client uscito.");
   close(client->sockfd);
   free(client);
   pthread_detach(pthread_self());
@@ -101,6 +103,22 @@ void *handle_client(void *cli) {
 pthread_t tid;
 void launch(struct Server* server)
 {
+  // Init mysql
+  con = mysql_init(NULL);
+
+  if (con == NULL) {
+    fprintf(stderr, "%s\n", mysql_error(con));
+    exit(1);
+  }
+
+  #ifdef __APPLE__
+  if (mysql_real_connect(con, "localhost", "root", "48752211852", "userDB", 0, NULL, 0) == NULL){
+      finish_with_error(con);
+  }
+  #endif
+
+
+
   char buffer[1204];
   printf("===== WAIT FOR CONNECTION =====\n");
   struct sockaddr_in cli_addr;
