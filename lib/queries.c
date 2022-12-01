@@ -26,17 +26,17 @@ char* concat(const char *s1, const char *s2)
 }
 
 
-unsigned int query_router(char* command, char** param, int length) {
+unsigned int query_router(MYSQL* con, char* command, char** param, int length) {
 
   if(strncmp(command, "signup", strlen(command)) == 0){
-      return signup(param, length);
+      return signup(con,param, length);
   }
   else{
       return -6969;
   }
 }
 
-unsigned int signup(char** param, int length){
+unsigned int signup(MYSQL* con, char** param, int length){
 
 
     char* query = "INSERT INTO users(username, passw) VALUES (";

@@ -13,11 +13,17 @@
 #include "lib/queries.h"
 
 
+
 // Struct del client
 typedef struct {
   struct sockaddr_in address;
   int sockfd;
 } client_t;
+
+struct threadArgs {
+  client_t* cli;
+  MYSQL* con;
+};
 
 char* jsonTest()
 {
@@ -34,12 +40,13 @@ char* jsonTest()
     return string;
 }
 
-void *handle_client(void *cli) {
+void *handle_client(void *args) {
   printf("Entered handle");
   char buff[2048];
   int leave_flag = 0;
 
-  client_t *client = (client_t *)cli;
+  struct threadArgs* arguments = (struct threadArgs*)args;
+  client_t *client = (client_t *)arguments->cli;
 
   while(1) {
     if (leave_flag) break;
@@ -70,7 +77,7 @@ void *handle_client(void *cli) {
           ++i;
         }
 
-        unsigned int error = query_router(command->valuestring, array, length);
+        unsigned int error = query_router(arguments->con,command->valuestring, array, length);
 
         for(int j=0; j<length; j++){
             free(array[j]);
@@ -94,6 +101,7 @@ void *handle_client(void *cli) {
 
   printf("Client uscito.");
   close(client->sockfd);
+  free(arguments);
   free(client);
   pthread_detach(pthread_self());
   return NULL;
@@ -104,7 +112,7 @@ pthread_t tid;
 void launch(struct Server* server)
 {
   // Init mysql
-  con = mysql_init(NULL);
+  MYSQL* con = mysql_init(NULL);
 
   if (con == NULL) {
     fprintf(stderr, "%s\n", mysql_error(con));
@@ -136,7 +144,8 @@ void launch(struct Server* server)
     cli->address = cli_addr;
     cli->sockfd = new_socket;
 
-    pthread_create(&tid, NULL, &handle_client, (void*)cli);
+    struct threadArgs args = {cli, con};
+    pthread_create(&tid, NULL, &handle_client, (void*)&args);
 
     sleep(1); // Previene uso eccessivo della ram
   }
