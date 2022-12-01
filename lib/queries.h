@@ -9,6 +9,7 @@ void finish_with_error(MYSQL*);
 unsigned int print_and_return_error(MYSQL*);
 
 unsigned int signup(MYSQL*, char**, int);
+unsigned int login(MYSQL*, char**, int);
 unsigned int query_router(MYSQL*,char*, char**, int);
 
 
