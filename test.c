@@ -77,6 +77,10 @@ void *handle_client(void *args) {
 
         queryResult_t* res = query_router(arguments->con,command->valuestring, array, length);
 
+        cJSON* json_result = cJSON_CreateObject();
+        cJSON_AddNumberToObject(json_result, "error", res->error);
+        cJSON* json_rows = cJSON_CreateArray();
+
         if (res->error == 0)
         {
           if (res->result != NULL) {
@@ -91,6 +95,7 @@ void *handle_client(void *args) {
                 lengths = mysql_fetch_lengths(res->result);
                 for(i = 0; i < num_fields; i++)
                 {
+                    cJSON_AddItemToArray(json_rows, cJSON_CreateString(row[i] ? row[i] : "NULL"));
                     printf("[%.*s] ", (int) lengths[i],
                             row[i] ? row[i] : "NULL");
                 }
@@ -99,18 +104,22 @@ void *handle_client(void *args) {
           }
         }
 
+        cJSON_AddItemToObject(json_result, "rows", json_rows);
+
 
         for(int j=0; j<length; j++){
             free(array[j]);
         }
         free(array);
 
+        char* json_string = cJSON_Print(json_result);
         // send message
-        sprintf(buff, "Messaggio da server linux -> codice errore: %d \n", res->error);
+        sprintf(buff, "%s\n", json_string);
         send(client->sockfd, buff, strlen(buff), 0);
 
         // Free results
         mysql_free_result(res->result);
+        cJSON_Delete(json_result);
         free(res);
       }
     } else if (receive == 0 || strncmp(buff, "exit", strlen("exit")) == 0) {
