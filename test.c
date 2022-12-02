@@ -106,8 +106,8 @@ void *handle_client(void *args) {
         free(array);
 
         // send message
-        sprintf(buff, "Messaggio da server linux -> codice errore: %d ", res->error);
-        send(client->sockfd, buff, strlen(buff), 0);       
+        sprintf(buff, "Messaggio da server linux -> codice errore: %d \n", res->error);
+        send(client->sockfd, buff, strlen(buff), 0);
 
         // Free results
         mysql_free_result(res->result);
