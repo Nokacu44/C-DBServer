@@ -26,7 +26,7 @@ char* concat(const char *s1, const char *s2)
 }
 
 
-unsigned int query_router(MYSQL* con, char* command, char** param, int length) {
+queryResult_t* query_router(MYSQL* con, char* command, char** param, int length) {
 
   if(strncmp(command, "signup", strlen(command)) == 0){
       return signup(con,param, length);
@@ -35,12 +35,18 @@ unsigned int query_router(MYSQL* con, char* command, char** param, int length) {
         return login(con,param, length);
   }
   else{
-      return -6969;
+      queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
+      res->error = -6969;
+      res->result = NULL;
+      return res;
   }
 }
 
-unsigned int signup(MYSQL* con, char** param, int length){
+queryResult_t* signup(MYSQL* con, char** param, int length){
 
+    queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
+    res->error = 0;
+    res->result = NULL;
 
     char* query = "INSERT INTO users(username, passw) VALUES (";
 
@@ -61,14 +67,19 @@ unsigned int signup(MYSQL* con, char** param, int length){
     query = concat(query, ")");
 
     if (mysql_query(con, query)) {
-        return print_and_return_error(con);
+        res->error = print_and_return_error(con);
+        return res;
     }
-
+    
     printf("QUERY COMPOSTA FINALE: %s\n", query);
     return 0;
 }
 
-unsigned int login(MYSQL* con, char** param, int length){
+queryResult_t* login(MYSQL* con, char** param, int length){
+
+    queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
+    res->error = 0;
+    res->result = NULL;
 
     char* query = "SELECT loginCheckFunct(";
 
@@ -89,15 +100,19 @@ unsigned int login(MYSQL* con, char** param, int length){
     query = concat(query, ")");
 
     if (mysql_query(con, query)) {
-        return print_and_return_error(con);
+        res->error = print_and_return_error(con);
+        return res;
     }
 
     MYSQL_RES* result = mysql_store_result(con);
+    res->result = result;
+
+    /*
     MYSQL_ROW row = mysql_fetch_row(result);
     printf("CREDENZIALI TROVATE? (0=NO, 1=SI): %s\n", row[0]);
+    */
     //TODO: MANDARE BIT DI RISULTATO AL CLIENT ANDROID
-    mysql_free_result(result);
 
     printf("QUERY COMPOSTA FINALE: %s\n", query);
-    return 0;
+    return res;
 }

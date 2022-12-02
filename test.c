@@ -12,8 +12,6 @@
 #include <stdlib.h>
 #include "lib/queries.h"
 
-
-
 // Struct del client
 typedef struct {
   struct sockaddr_in address;
@@ -77,7 +75,30 @@ void *handle_client(void *args) {
           ++i;
         }
 
-        unsigned int error = query_router(arguments->con,command->valuestring, array, length);
+        queryResult_t* res = query_router(arguments->con,command->valuestring, array, length);
+
+        if (res->error == 0)
+        {
+          if (res->result != NULL) {
+              MYSQL_ROW row;
+              unsigned int num_fields;
+              unsigned int i;
+
+              num_fields = mysql_num_fields(res->result);
+              while ((row = mysql_fetch_row(res->result)))
+              {
+                unsigned long *lengths;
+                lengths = mysql_fetch_lengths(res->result);
+                for(i = 0; i < num_fields; i++)
+                {
+                    printf("[%.*s] ", (int) lengths[i],
+                            row[i] ? row[i] : "NULL");
+                }
+                printf("\n");
+              }
+          }
+        }
+
 
         for(int j=0; j<length; j++){
             free(array[j]);
@@ -85,8 +106,12 @@ void *handle_client(void *args) {
         free(array);
 
         // send message
-        sprintf(buff, "Messaggio da server linux -> codice query: %d", error);
+        sprintf(buff, "Messaggio da server linux -> codice errore: %d ", res->error);
         send(client->sockfd, buff, strlen(buff), 0);       
+
+        // Free results
+        mysql_free_result(res->result);
+        free(res);
       }
     } else if (receive == 0 || strncmp(buff, "exit", strlen("exit")) == 0) {
       printf("Client uscito.");
@@ -101,6 +126,7 @@ void *handle_client(void *args) {
 
   printf("Client uscito.");
   close(client->sockfd);
+  free(arguments->con);
   free(arguments);
   free(client);
   pthread_detach(pthread_self());
