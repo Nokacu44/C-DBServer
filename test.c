@@ -39,7 +39,7 @@ char* jsonTest()
 }
 
 void *handle_client(void *args) {
-  printf("Entered handle");
+  printf("Entered handle\n");
   char buff[2048];
   int leave_flag = 0;
 
@@ -54,6 +54,8 @@ void *handle_client(void *args) {
       if (strlen(buff) > 0) {
  
         // Check se è json...
+
+
         // parsing
         cJSON* query = cJSON_ParseWithLength(buff, strlen(buff));
         cJSON* command = cJSON_GetObjectItemCaseSensitive(query, "command");
@@ -75,7 +77,7 @@ void *handle_client(void *args) {
           ++i;
         }
 
-        queryResult_t* res = query_router(arguments->con,command->valuestring, array, length);
+        queryResult_t* res = query_router(arguments->con, command->valuestring, array, length);
 
         cJSON* json_result = cJSON_CreateObject();
         cJSON_AddNumberToObject(json_result, "error", res->error);
@@ -101,10 +103,12 @@ void *handle_client(void *args) {
                 }
                 printf("\n");
               }
-          }
-        }
 
-        cJSON_AddItemToObject(json_result, "rows", json_rows);
+              cJSON_AddItemToObject(json_result, "rows", json_rows);
+          }
+        } else if (res->error == 6969) {
+          leave_flag = 1;
+        }
 
 
         for(int j=0; j<length; j++){
@@ -112,15 +116,24 @@ void *handle_client(void *args) {
         }
         free(array);
 
-        char* json_string = cJSON_Print(json_result);
-        // send message
-        sprintf(buff, "%s\n", json_string);
-        send(client->sockfd, buff, strlen(buff), 0);
+
 
         // Free results
         mysql_free_result(res->result);
-        cJSON_Delete(json_result);
         free(res);
+
+        if (leave_flag == 1) {
+          continue;
+        }
+
+        char* json_string = cJSON_Print(json_result);
+        cJSON_Delete(json_result);
+
+        // send message
+        sprintf(buff, "%s\n", json_string);
+        send(client->sockfd, buff, strlen(buff), 0);       
+
+
       }
     } else if (receive == 0 || strncmp(buff, "exit", strlen("exit")) == 0) {
       printf("Client uscito.");
@@ -133,10 +146,11 @@ void *handle_client(void *args) {
     bzero(buff, 2048);
   }
 
-  printf("Client uscito.");
+  printf("Client uscito.\n");
   close(client->sockfd);
-  free(arguments->con);
-  free(arguments);
+  arguments->con = NULL;
+
+  //free(arguments);
   free(client);
   pthread_detach(pthread_self());
   return NULL;
@@ -146,21 +160,23 @@ void *handle_client(void *args) {
 pthread_t tid;
 void launch(struct Server* server)
 {
+  printf("===== SERVER STARTED =====\n");
   // Init mysql
   MYSQL* con = mysql_init(NULL);
-
   if (con == NULL) {
     fprintf(stderr, "%s\n", mysql_error(con));
     exit(1);
   }
-
   #ifdef __APPLE__
   if (mysql_real_connect(con, "localhost", "root", "48752211852", "userDB", 0, NULL, 0) == NULL){
       finish_with_error(con);
   }
+  #else
+  if (mysql_real_connect(con, "localhost", "root", "poteredelcristallodiluna", "userDB", 0, NULL, 0) == NULL){
+      finish_with_error(con);
+  }
   #endif
-
-
+  printf("DB Connection Stats: %s\n", mysql_stat(con));
 
   char buffer[1204];
   printf("===== WAIT FOR CONNECTION =====\n");
@@ -184,6 +200,8 @@ void launch(struct Server* server)
 
     sleep(1); // Previene uso eccessivo della ram
   }
+
+  mysql_close(con);
 }
 
 int main() 

@@ -29,14 +29,14 @@ char* concat(const char *s1, const char *s2)
 queryResult_t* query_router(MYSQL* con, char* command, char** param, int length) {
 
   if(strncmp(command, "signup", strlen(command)) == 0){
-      return signup(con,param, length);
+    return signup(con,param, length);
   }
   else if(strncmp(command, "login", strlen(command)) == 0){
-        return login(con,param, length);
+    return login(con,param, length);
   }
   else{
       queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
-      res->error = -6969;
+      res->error = 6969;
       res->result = NULL;
       return res;
   }
