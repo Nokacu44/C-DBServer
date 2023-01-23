@@ -47,6 +47,7 @@ void *handle_client(void *args) {
   client_t *client = (client_t *)arguments->cli;
 
   while(1) {
+    printf("INIZIO WHILE LOOP\n");
     if (leave_flag) break;
 
     int receive = recv(client->sockfd, buff, 2048, 0);
@@ -133,16 +134,16 @@ void *handle_client(void *args) {
         sprintf(buff, "%s\n", json_string);
         send(client->sockfd, buff, strlen(buff), 0);       
 
-
+        printf("MESSAGGIO INVIATO\n");
       }
-    } else if (receive == 0 || strncmp(buff, "exit", strlen("exit")) == 0) {
-      printf("Client uscito.");
+    } else if (receive == 0) {
+      printf("Client uscito.\n");
       leave_flag = 1;
     } else {
       printf("ERROR: -1\n");
       leave_flag = 1;
     }
-
+    printf("BUFF\n");
     bzero(buff, 2048);
   }
 
@@ -197,7 +198,8 @@ void launch(struct Server* server)
 
     struct threadArgs args = {cli, con};
     pthread_create(&tid, NULL, &handle_client, (void*)&args);
-
+    // Previene creazione di nuovi thread mentre client ancora connesso
+    pthread_join(tid, NULL);
     sleep(1); // Previene uso eccessivo della ram
   }
 

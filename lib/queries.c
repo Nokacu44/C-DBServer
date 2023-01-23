@@ -33,10 +33,16 @@ queryResult_t* query_router(MYSQL* con, char* command, char** param, int length)
   }
   else if(strncmp(command, "login", strlen(command)) == 0){
     return login(con,param, length);
+  } else if (strncmp(command, "exit", strlen(command)) == 0)
+  {
+    queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
+    res->error = 6969;
+    res->result = NULL;
+    return res;    
   }
-  else{
+  else{ /*EX*/
       queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
-      res->error = 6969;
+      res->error = -1;
       res->result = NULL;
       return res;
   }
@@ -72,7 +78,7 @@ queryResult_t* signup(MYSQL* con, char** param, int length){
     }
     
     printf("QUERY COMPOSTA FINALE: %s\n", query);
-    return 0;
+    return res;
 }
 
 queryResult_t* login(MYSQL* con, char** param, int length){
