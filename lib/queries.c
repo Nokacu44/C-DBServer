@@ -119,14 +119,6 @@ queryResult_t* login(MYSQL* con, char** param, int length){
     MYSQL_RES* result = mysql_store_result(con);
     res->result = result;
 
-    /*
-    MYSQL_ROW row = mysql_fetch_row(result);
-    printf("CREDENZIALI TROVATE? (0=NO, 1=SI): %s\n", row[0]);
-    */
-    //TODO: MANDARE BIT DI RISULTATO AL CLIENT ANDROID
-
-    //TODO: O FORSE NO PERCHè GIà FUNZIONA?
-
     printf("QUERY COMPOSTA FINALE: %s\n", query);
     return res;
 }
@@ -148,6 +140,7 @@ queryResult_t* updatePreferences(MYSQL* con, char** param, int length){
         return res;
     }
 
+    printf("QUERY COMPOSTA FINALE: %s\n", query);
     return res;
 }
 
