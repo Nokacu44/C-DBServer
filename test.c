@@ -105,7 +105,7 @@ void *handle_client(void *args) {
                 printf("\n");
               }
 
-              cJSON_AddItemToObject(json_result, "rows", json_rows);
+              //cJSON_AddItemToObject(json_result, "rows", json_rows);
           }
         } else if (res->error == 6969) {
           printf("CHIAMATO EXIT\n");
