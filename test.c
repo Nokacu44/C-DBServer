@@ -135,6 +135,8 @@ void *handle_client(void *args) {
         sprintf(buff, "%s\n", json_string);
         send(client->sockfd, buff, strlen(buff), 0);       
 
+        printf("%s\n", json_string);
+
         printf("MESSAGGIO INVIATO\n");
       }
     } else if (receive == 0) {
