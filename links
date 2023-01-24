@@ -1,1 +1,3 @@
 https://zetcode.com/db/mysqlc/
+
+sudo service mysql restart
