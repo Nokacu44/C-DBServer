@@ -28,13 +28,16 @@ char* concat(const char *s1, const char *s2)
 
 queryResult_t* query_router(MYSQL* con, char* command, char** param, int length) {
 
-  if(strncmp(command, "signup", strlen(command)) == 0){
+  if(strncmp(command, "signup", strlen(command)) == 0) {
     return signup(con,param, length);
   }
-  else if(strncmp(command, "login", strlen(command)) == 0){
+  else if(strncmp(command, "login", strlen(command)) == 0) {
     return login(con,param, length);
-  } else if (strncmp(command, "exit", strlen(command)) == 0)
-  {
+  }
+  else if(strncmp(command, "updatePreferences", strlen(command)) == 0) {
+      return updatePreferences(con, param, length);
+  }
+  else if (strncmp(command, "exit", strlen(command)) == 0) {
     queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
     res->error = 6969;
     res->result = NULL;
@@ -120,5 +123,25 @@ queryResult_t* login(MYSQL* con, char** param, int length){
     //TODO: MANDARE BIT DI RISULTATO AL CLIENT ANDROID
 
     printf("QUERY COMPOSTA FINALE: %s\n", query);
+    return res;
+}
+
+queryResult_t* updatePreferences(MYSQL* con, char** param, int length){
+
+    queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
+    res->error = 0;
+    res->result = NULL;
+
+    char* query = "UPDATE preferences SET value = value+1 WHERE(ingr_ref=(SELECT i.ingr_id FROM ingredients AS i WHERE i.ingr_name = ";
+    query = concat(query, param[0]);
+    query = concat(query, ") AND user_ref=(SELECT u.user_id FROM users AS u WHERE u.username = '");
+    query = concat(query, param[1]);
+    query = concat(query, "'))");
+
+    if (mysql_query(con, query)) {
+        res->error = print_and_return_error(con);
+        return res;
+    }
+
     return res;
 }
