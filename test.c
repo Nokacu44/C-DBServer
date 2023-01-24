@@ -112,6 +112,7 @@ void *handle_client(void *args) {
           leave_flag = 1;
         }
 
+        cJSON_AddItemToObject(json_result, "rows", json_rows);
 
         for(int j=0; j<length; j++){
             free(array[j]);
