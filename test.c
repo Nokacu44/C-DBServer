@@ -108,6 +108,7 @@ void *handle_client(void *args) {
               cJSON_AddItemToObject(json_result, "rows", json_rows);
           }
         } else if (res->error == 6969) {
+          printf("CHIAMATO EXIT\n");
           leave_flag = 1;
         }
 
@@ -199,7 +200,8 @@ void launch(struct Server* server)
     struct threadArgs args = {cli, con};
     pthread_create(&tid, NULL, &handle_client, (void*)&args);
     // Previene creazione di nuovi thread mentre client ancora connesso
-    pthread_join(tid, NULL);
+    //pthread_join(tid, NULL);
+    printf("SEEEEEX\n");
     sleep(1); // Previene uso eccessivo della ram
   }
 
