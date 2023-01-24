@@ -37,6 +37,9 @@ queryResult_t* query_router(MYSQL* con, char* command, char** param, int length)
   else if(strncmp(command, "updatePreferences", strlen(command)) == 0) {
       return updatePreferences(con, param, length);
   }
+  else if(strncmp(command, "getPreferences", strlen(command)) == 0) {
+      return getPreferences(con, param, length);
+  }
   else if (strncmp(command, "exit", strlen(command)) == 0) {
     queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
     res->error = 6969;
@@ -122,6 +125,8 @@ queryResult_t* login(MYSQL* con, char** param, int length){
     */
     //TODO: MANDARE BIT DI RISULTATO AL CLIENT ANDROID
 
+    //TODO: O FORSE NO PERCHè GIà FUNZIONA?
+
     printf("QUERY COMPOSTA FINALE: %s\n", query);
     return res;
 }
@@ -143,5 +148,29 @@ queryResult_t* updatePreferences(MYSQL* con, char** param, int length){
         return res;
     }
 
+    return res;
+}
+
+queryResult_t* getPreferences(MYSQL* con, char** param, int length){
+
+    queryResult_t* res = (queryResult_t*) malloc(sizeof(queryResult_t));
+    res->error = 0;
+    res->result = NULL;
+
+    char* query = "SELECT i.ingr_name FROM preferences AS p JOIN ingredients AS i ON i.ingr_id=p.ingr_ref "
+                  "WHERE p.user_ref = (SELECT u.user_id FROM users AS u WHERE u.username = '";
+    query = concat(query, param[0]);
+    query = concat(query, "') ORDER BY p.value DESC LIMIT 3");
+
+    if (mysql_query(con, query)) {
+        res->error = print_and_return_error(con);
+        return res;
+    }
+
+    puts("fsss");
+    MYSQL_RES* result = mysql_store_result(con);
+    res->result = result;
+
+    printf("QUERY COMPOSTA FINALE: %s\n", query);
     return res;
 }
