@@ -19,8 +19,6 @@ CREATE TABLE IF NOT EXISTS preferences(
     FOREIGN KEY(user_ref) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY(ingr_ref) REFERENCES ingredients(ingr_id) ON DELETE CASCADE ON UPDATE CASCADE);
     
-INSERT INTO users (username,passw) VALUES ('admin', 'admin');
-
 INSERT INTO ingredients (ingr_name) VALUES ('');
 INSERT INTO ingredients (ingr_name) VALUES ('Eragrostideae');
 INSERT INTO ingredients (ingr_name) VALUES ('Vitis Vinifera');
@@ -58,20 +56,30 @@ INSERT INTO ingredients (ingr_name) VALUES ('Glycine');
 INSERT INTO ingredients (ingr_name) VALUES ('Fruits');
 INSERT INTO ingredients (ingr_name) VALUES ('Poacceae');
 INSERT INTO ingredients (ingr_name) VALUES ('Vegetables');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q1093742');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q147316');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q169');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q12330939');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q177092');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q503');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q3342808');
-INSERT INTO ingredients (ingr_name) VALUES ('"http://www.wikidata.org/entity/Q10817602');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q13179');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q5812410');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q5881191');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q14458220');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q83376');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q60708120');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q2224510');
-INSERT INTO ingredients (ingr_name) VALUES ('http://www.wikidata.org/entity/Q1150849');
+
+INSERT INTO ingredients (ingr_name) VALUES ('ananas');
+INSERT INTO ingredients (ingr_name) VALUES ('noce di cocco');
+INSERT INTO ingredients (ingr_name) VALUES ('mirtillo');
+INSERT INTO ingredients (ingr_name) VALUES ('lampone');
+INSERT INTO ingredients (ingr_name) VALUES ('succo di lampone');
+INSERT INTO ingredients (ingr_name) VALUES ('mirtillo europeo');
+INSERT INTO ingredients (ingr_name) VALUES ('succo di mirtillo');
+INSERT INTO ingredients (ingr_name) VALUES ('fragola');
+INSERT INTO ingredients (ingr_name) VALUES ('succo di fragola');
+INSERT INTO ingredients (ingr_name) VALUES ('succo di ananas');
+INSERT INTO ingredients (ingr_name) VALUES ('rum');
+INSERT INTO ingredients (ingr_name) VALUES ('malibu rum');
+INSERT INTO ingredients (ingr_name) VALUES ('bacardi rum');
+INSERT INTO ingredients (ingr_name) VALUES ('bumbu rum');
+INSERT INTO ingredients (ingr_name) VALUES ('bacardi');
+INSERT INTO ingredients (ingr_name) VALUES ('bacardi breezer');
+INSERT INTO ingredients (ingr_name) VALUES ('latte di cocco');
+INSERT INTO ingredients (ingr_name) VALUES ('menta');
+INSERT INTO ingredients (ingr_name) VALUES ('gin');
+INSERT INTO ingredients (ingr_name) VALUES ('melone');
+INSERT INTO ingredients (ingr_name) VALUES ('mango');
+INSERT INTO ingredients (ingr_name) VALUES ('frutto della passione');
+INSERT INTO ingredients (ingr_name) VALUES ('banana');
+INSERT INTO ingredients (ingr_name) VALUES ('limone');
+
 
