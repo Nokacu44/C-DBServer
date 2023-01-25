@@ -6,7 +6,14 @@ SET NAMES utf8;
 CREATE TABLE IF NOT EXISTS users(
 	user_id INT AUTO_INCREMENT PRIMARY KEY,
 	username VARCHAR(50) NOT NULL UNIQUE,
-	passw VARCHAR(15) NOT NULL);
+	passw VARCHAR(15) NOT NULL,
+    nome VARCHAR(30),
+    cognome VARCHAR(30),
+    phone VARCHAR(15),
+    address VARCHAR(25),
+    cap VARCHAR(8),
+    city VARCHAR(20),
+    province VARCHAR(25));
 	
 CREATE TABLE IF NOT EXISTS ingredients(
 	ingr_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -19,7 +26,7 @@ CREATE TABLE IF NOT EXISTS preferences(
     FOREIGN KEY(user_ref) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY(ingr_ref) REFERENCES ingredients(ingr_id) ON DELETE CASCADE ON UPDATE CASCADE);
     
-INSERT INTO ingredients (ingr_name) VALUES ('');
+INSERT INTO ingredients (ingr_name) VALUES ('speciale');
 INSERT INTO ingredients (ingr_name) VALUES ('Eragrostideae');
 INSERT INTO ingredients (ingr_name) VALUES ('Vitis Vinifera');
 INSERT INTO ingredients (ingr_name) VALUES ('Anise');
