@@ -1,4 +1,3 @@
-
 #include <string.h>
 #include "queries.h"
 
@@ -172,7 +171,6 @@ queryResult_t* getPreferences(MYSQL* con, char** param, int length){
         return res;
     }
 
-    puts("fsss");
     MYSQL_RES* result = mysql_store_result(con);
     res->result = result;
 
