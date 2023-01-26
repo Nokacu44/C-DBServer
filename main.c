@@ -6,8 +6,8 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
-#include <fcntl.h> // for open()
-#include <unistd.h> // for close()
+#include <fcntl.h> 
+#include <unistd.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include "lib/queries.h"
@@ -23,20 +23,6 @@ struct threadArgs {
   MYSQL* con;
 };
 
-char* jsonTest()
-{
-    
-    cJSON* persona = cJSON_CreateObject();
-    
-    cJSON_AddStringToObject(persona, "nome", "CARMINE");
-    cJSON_AddStringToObject(persona, "cognome", "ARENA");
-    cJSON_AddNumberToObject(persona, "eta", 69.0f);
-
-    char* string = cJSON_Print(persona);
-    cJSON_Delete(persona);
-
-    return string;
-}
 
 void *handle_client(void *args) {
   printf("Entered handle\n");
@@ -53,10 +39,6 @@ void *handle_client(void *args) {
     int receive = recv(client->sockfd, buff, 2048, 0);
     if (receive > 0) {
       if (strlen(buff) > 0) {
- 
-        // Check se è json...
-
-
         // parsing
         cJSON* query = cJSON_ParseWithLength(buff, strlen(buff));
         cJSON* command = cJSON_GetObjectItemCaseSensitive(query, "command");
@@ -137,8 +119,6 @@ void *handle_client(void *args) {
         send(client->sockfd, buff, strlen(buff), 0);       
 
         printf("%s\n", json_string);
-
-        printf("MESSAGGIO INVIATO\n");
       }
     } else if (receive == 0) {
       printf("Client uscito.\n");
@@ -203,8 +183,6 @@ void launch(struct Server* server)
     struct threadArgs args = {cli, con};
     pthread_create(&tid, NULL, &handle_client, (void*)&args);
     // Previene creazione di nuovi thread mentre client ancora connesso
-    //pthread_join(tid, NULL);
-    printf("SEEEEEX\n");
     sleep(1); // Previene uso eccessivo della ram
   }
 
